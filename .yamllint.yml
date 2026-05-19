@@ -1,0 +1,22 @@
+---
+# yamllint configuration for the kube-state repository.
+# This repo holds cluster-state metadata (cluster.yaml, helm.yaml, values.yaml)
+# consumed by a GitOps or chart-rollout tool. All files are pure YAML, so
+# linting is enabled across the entire repository.
+
+extends: default
+
+rules:
+  line-length:
+    max: 160
+    level: warning
+  comments:
+    min-spaces-from-content: 1
+  truthy:
+    allowed-values: ['true', 'false', 'on', 'off']
+    check-keys: false
+  document-start:
+    present: false
+  indentation:
+    spaces: 2
+    indent-sequences: consistent
