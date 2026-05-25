@@ -1,0 +1,10 @@
+chart: shophub
+version: "0.1.0"
+release: shophub-discord
+namespace: shophub
+createNamespace: true
+source:
+  type: git
+  url: https://github.com/shophub-project-2026/helm-charts
+  path: charts/shophub
+  revision: main
