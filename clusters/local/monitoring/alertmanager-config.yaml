@@ -1,0 +1,36 @@
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: AlertmanagerConfig
+metadata:
+  name: discord-webhook
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack
+spec:
+  route:
+    receiver: discord
+    groupBy:
+      - alertname
+      - namespace
+      - severity
+    groupWait: 30s
+    groupInterval: 5m
+    repeatInterval: 12h
+    matchers:
+      - name: alertname
+        matchType: "=~"
+        value: ".+"
+  receivers:
+    - name: discord
+      discordConfigs:
+        - webhookURL:
+            key: webhook-url
+            name: alertmanager-discord-secret
+          title: >-
+            [{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}]
+            {{ .CommonLabels.alertname }}
+          message: >-
+            {{ range .Alerts }}
+            **Alert:** {{ .Annotations.summary }}
+            **Severity:** {{ .Labels.severity }}
+            **Description:** {{ .Annotations.description }}
+            {{ end }}
