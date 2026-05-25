@@ -1,0 +1,4 @@
+name: local
+provider: minikube
+kubeVersion: ">=1.26.0"
+description: Local development cluster running on Minikube

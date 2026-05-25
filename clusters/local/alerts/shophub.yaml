@@ -1,0 +1,84 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: shophub-alerts
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack
+spec:
+  groups:
+    - name: shophub.rules
+      interval: 30s
+      rules:
+        - alert: ShophubHighErrorRate
+          expr: |
+            sum(rate(shophub_http_requests_total{status=~"5.."}[5m]))
+            /
+            sum(rate(shophub_http_requests_total[5m])) * 100 > 5
+          for: 5m
+          labels:
+            severity: warning
+            team: shophub
+          annotations:
+            summary: ShopHub HTTP error rate above 5%
+            description: >-
+              ShopHub is returning HTTP 5xx errors at {{ printf "%.2f" $value }}%
+              over the last 5 minutes.
+
+        - alert: ShophubCriticalErrorRate
+          expr: |
+            sum(rate(shophub_http_requests_total{status=~"5.."}[5m]))
+            /
+            sum(rate(shophub_http_requests_total[5m])) * 100 > 20
+          for: 5m
+          labels:
+            severity: critical
+            team: shophub
+          annotations:
+            summary: ShopHub HTTP error rate above 20%
+            description: >-
+              ShopHub is returning HTTP 5xx errors at {{ printf "%.2f" $value }}%
+              over the last 5 minutes. Immediate action required.
+
+        - alert: ShophubHighLatency
+          expr: |
+            histogram_quantile(0.99,
+              sum(rate(shophub_http_request_duration_seconds_bucket[5m])) by (le)
+            ) > 1
+          for: 5m
+          labels:
+            severity: warning
+            team: shophub
+          annotations:
+            summary: ShopHub P99 latency above 1s
+            description: >-
+              ShopHub P99 request latency is {{ printf "%.2fs" $value }},
+              exceeding the 1s threshold.
+
+        - alert: ShophubDown
+          expr: |
+            absent(rate(shophub_http_requests_total[5m]))
+          for: 5m
+          labels:
+            severity: critical
+            team: shophub
+          annotations:
+            summary: ShopHub is not receiving traffic
+            description: >-
+              No HTTP requests have been recorded for ShopHub in the last 5 minutes.
+              The service may be down.
+
+        - alert: ShophubK8sOperationErrors
+          expr: |
+            sum(rate(shophub_k8s_operations_total{result="error"}[5m]))
+            /
+            sum(rate(shophub_k8s_operations_total[5m])) * 100 > 10
+          for: 5m
+          labels:
+            severity: warning
+            team: shophub
+          annotations:
+            summary: ShopHub Kubernetes operation error rate above 10%
+            description: >-
+              ShopHub is failing {{ printf "%.2f" $value }}% of Kubernetes API
+              operations. Check cluster connectivity and RBAC configuration.
