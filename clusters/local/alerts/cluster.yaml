@@ -1,0 +1,76 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: cluster-alerts
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack
+spec:
+  groups:
+    - name: cluster.rules
+      interval: 60s
+      rules:
+        - alert: NodeNotReady
+          expr: |
+            kube_node_status_condition{condition="Ready",status="true"} == 0
+          for: 5m
+          labels:
+            severity: critical
+            team: platform
+          annotations:
+            summary: Node {{ $labels.node }} is not ready
+            description: >-
+              Node {{ $labels.node }} has been in a NotReady state for more than
+              5 minutes. Check node status and system logs.
+
+        - alert: PodCrashLooping
+          expr: |
+            rate(kube_pod_container_status_restarts_total[15m]) * 60 > 3
+          for: 5m
+          labels:
+            severity: warning
+            team: platform
+          annotations:
+            summary: Pod {{ $labels.namespace }}/{{ $labels.pod }} is crash-looping
+            description: >-
+              Container {{ $labels.container }} in pod {{ $labels.namespace }}/{{ $labels.pod }}
+              is restarting {{ printf "%.0f" $value }} times per minute.
+
+        - alert: PodPendingTooLong
+          expr: |
+            kube_pod_status_phase{phase="Pending"} == 1
+          for: 15m
+          labels:
+            severity: warning
+            team: platform
+          annotations:
+            summary: Pod {{ $labels.namespace }}/{{ $labels.pod }} is stuck in Pending
+            description: >-
+              Pod {{ $labels.namespace }}/{{ $labels.pod }} has been in Pending state
+              for more than 15 minutes. Check resource availability and scheduling constraints.
+
+        - alert: HighNodeMemoryUsage
+          expr: |
+            (1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100 > 85
+          for: 5m
+          labels:
+            severity: warning
+            team: platform
+          annotations:
+            summary: Node memory usage above 85% on {{ $labels.node }}
+            description: >-
+              Node {{ $labels.node }} memory usage is at {{ printf "%.1f" $value }}%.
+              Consider scaling the cluster or reducing workload.
+
+        - alert: HighNodeCPUUsage
+          expr: |
+            100 - (avg by (node) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 90
+          for: 10m
+          labels:
+            severity: warning
+            team: platform
+          annotations:
+            summary: Node CPU usage above 90% on {{ $labels.node }}
+            description: >-
+              Node {{ $labels.node }} CPU usage has been above 90% for more than
+              10 minutes. Value is {{ printf "%.1f" $value }}%.
