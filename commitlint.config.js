@@ -4,6 +4,6 @@ module.exports = {
 	ignores: [
 		(commit) => commit.startsWith('Merge branch'),
 		(commit) => commit.startsWith('Merge pull request'),
-		(commit) => /\(#\d+\)$/.test(commit),
+		(commit) => /\(#\d+\)/.test(commit.split('\n')[0]),
 	],
 };
