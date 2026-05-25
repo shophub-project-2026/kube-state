@@ -1,0 +1,49 @@
+image:
+  repository: milos2002/shophub
+  tag: main
+  pullPolicy: Always
+
+replicaCount: 1
+
+ingress:
+  enabled: true
+  className: nginx
+  hosts:
+    - host: shophub.local
+      paths:
+        - path: /
+          pathType: Prefix
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+hpa:
+  enabled: false
+
+config:
+  httpPort: "8080"
+  jwtSecret: "change-me-before-deploy"
+  db:
+    host: postgresql.shophub.svc.cluster.local
+    port: "5432"
+    name: shophub_db
+    user: shophub_user
+    password: "change-me-before-deploy"
+  kubeconfig: ""
+
+serviceMonitor:
+  enabled: true
+  interval: 30s
+  path: /metrics
+
+rbac:
+  create: true
+
+serviceAccount:
+  create: true
+  name: ""
