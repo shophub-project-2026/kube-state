@@ -1,6 +1,6 @@
 image:
   repository: milos2002/shop-operator
-  tag: main
+  tag: development
   pullPolicy: Always
 
 replicaCount: 1
