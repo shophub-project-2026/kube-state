@@ -22,7 +22,7 @@ spec:
   receivers:
     - name: discord
       discordConfigs:
-        - webhookURL:
+        - apiURL:
             key: webhook-url
             name: alertmanager-discord-secret
           title: >-
