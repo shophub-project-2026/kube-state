@@ -1,0 +1,22 @@
+# Scrapes every Shop instance created by the shop-operator.
+# Shop pods carry the label app.kubernetes.io/name=shop and expose
+# the named container port "http" (8080) at /metrics.
+# A single cluster-wide PodMonitor covers all shops, so newly created
+# shops become observable automatically (their dashboard filters by pod/namespace).
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: shop-instances
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack
+spec:
+  namespaceSelector:
+    any: true
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: shop
+  podMetricsEndpoints:
+    - port: http
+      path: /metrics
+      interval: 30s
