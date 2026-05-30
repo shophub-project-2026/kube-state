@@ -34,7 +34,16 @@ alertmanager:
       type: None
 
 grafana:
-  adminPassword: admin
+  # §4.1: only maintainers may access Grafana. Login is required (anonymous
+  # access disabled) and self sign-up is off, so ShopHub end users — who never
+  # receive these credentials and reach Grafana via no ShopHub link — have no
+  # access. Change adminPassword before any non-local deployment.
+  adminPassword: "shophub-maintainer-2026"
+  grafana.ini:
+    users:
+      allow_sign_up: false
+    auth.anonymous:
+      enabled: false
   sidecar:
     dashboards:
       enabled: true
