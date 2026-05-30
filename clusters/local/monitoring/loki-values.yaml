@@ -1,0 +1,31 @@
+# Loki + Promtail (grafana/loki-stack) — aggregates logs from every pod.
+# Release: loki, namespace: monitoring. Promtail (DaemonSet) tails container
+# logs and ships them to Loki, reachable at loki.monitoring:3100.
+# Grafana is disabled here; the kube-prometheus-stack Grafana is used instead.
+loki:
+  isDefault: false
+  persistence:
+    enabled: false
+  config:
+    limits_config:
+      retention_period: 24h
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      memory: 512Mi
+
+promtail:
+  enabled: true
+  resources:
+    requests:
+      cpu: 25m
+      memory: 64Mi
+    limits:
+      memory: 192Mi
+
+grafana:
+  enabled: false
+prometheus:
+  enabled: false

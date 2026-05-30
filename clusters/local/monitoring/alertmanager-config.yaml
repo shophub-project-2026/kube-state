@@ -15,10 +15,14 @@ spec:
     groupWait: 30s
     groupInterval: 5m
     repeatInterval: 12h
+    # Platform-level alerts (Kubernetes cluster + ShopHub) carry a team label.
+    # Per-shop alerts carry a `shop` label instead and are routed to that shop's
+    # own Discord channel by the operator-generated AlertmanagerConfig, so they
+    # are intentionally excluded here.
     matchers:
-      - name: alertname
+      - name: team
         matchType: "=~"
-        value: ".+"
+        value: "platform|shophub"
   receivers:
     - name: discord
       discordConfigs:
