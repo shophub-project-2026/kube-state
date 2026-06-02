@@ -19,3 +19,14 @@ rbac:
 serviceAccount:
   create: true
   name: ""
+
+# Per-shop Discord channels (spec §3.1/§4.1). Set guildId to your Discord
+# server (guild) ID and apply shop-operator-discord-secret.yaml in this folder
+# with a real bot token. With both set, the operator creates a dedicated
+# channel + webhook for every shop. Leave guildId empty to keep the operator
+# running with only the manual webhookUrl override.
+discord:
+  guildId: "1509899947179511900"
+  botToken:
+    secretName: shop-operator-discord-bot
+    secretKey: bot-token
