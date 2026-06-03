@@ -1,51 +1,18 @@
-image:
-  repository: milos2002/shophub
-  tag: main
-  pullPolicy: Always
-
-replicaCount: 1
-
-ingress:
-  enabled: true
-  className: nginx
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
-  hosts:
-    - host: shophub-discord.local
-      paths:
-        - path: /
-          pathType: Prefix
-
-resources:
-  limits:
-    cpu: 250m
-    memory: 128Mi
-  requests:
-    cpu: 50m
-    memory: 64Mi
-
-config:
-  httpPort: "8080"
-  jwtSecret: "change-me-before-deploy"
-  db:
-    host: postgresql.shophub.svc.cluster.local
-    port: "5432"
-    name: shophub_db
-    user: shophub_user
-    password: "change-me-before-deploy"
-  kubeconfig: ""
-
-podAnnotations:
-  discord.shophub.io/channel: "alerts"
-
-serviceMonitor:
-  enabled: true
-  interval: 15s
-  path: /metrics
-
-rbac:
-  create: false
-
-serviceAccount:
-  create: false
-  name: shophub
+# Platform Discord integration for ShopHub and cluster-level alerts.
+#
+# The platform webhook URL is stored in the Secret alertmanager-discord-secret
+# in the monitoring namespace (never committed to git). This Secret is
+# referenced by the AlertmanagerConfig in clusters/local/monitoring/alertmanager-config.yaml
+# which routes alerts with team=platform or team=shophub labels to Discord.
+#
+# To provision the secret:
+#   kubectl create secret generic alertmanager-discord-secret -n monitoring \
+#     --from-literal=webhook-url='<your-discord-webhook-url>'
+#
+# A placeholder with an empty URL is applied by pokretanje.ps1 if the secret
+# is not present (see clusters/local/monitoring/alertmanager-discord-secret.yaml).
+discord:
+  alertmanager:
+    secretName: alertmanager-discord-secret
+    secretKey: webhook-url
+    namespace: monitoring
