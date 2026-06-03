@@ -1,0 +1,13 @@
+auth:
+  username: shophub_user
+  database: shophub_db
+  # password is injected at deploy time via --set auth.password=$env:SHOPHUB_DB_PASSWORD
+  # Never commit the real password here.
+
+primary:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      memory: 512Mi

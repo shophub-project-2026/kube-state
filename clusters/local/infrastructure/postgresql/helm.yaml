@@ -1,0 +1,15 @@
+chart: postgresql
+release: postgresql
+namespace: shophub
+createNamespace: true
+timeout: 4m
+source:
+  type: helm
+  repoName: bitnami
+  repoUrl: https://charts.bitnami.com/bitnami
+valuesFile: infrastructure/postgresql/values.yaml
+waitFor:
+  kind: pod
+  selector: app.kubernetes.io/instance=postgresql
+  namespace: shophub
+  timeout: 180s
