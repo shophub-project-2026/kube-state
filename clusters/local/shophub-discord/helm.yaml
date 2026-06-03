@@ -1,6 +1,6 @@
 chart: shophub
 version: "0.1.0"
-release: shophub-discord
+release: shophub
 namespace: shophub
 createNamespace: true
 source:
@@ -8,3 +8,9 @@ source:
   url: https://github.com/shophub-project-2026/helm-charts
   path: charts/shophub
   revision: main
+# This directory tracks the platform-level Discord integration for ShopHub
+# and cluster alerts. The alertmanager-discord-secret (platform webhook URL)
+# is provisioned out-of-band via pokretanje.ps1 and stored in the
+# monitoring namespace. See clusters/local/monitoring/alertmanager-discord-secret.yaml
+# for the placeholder and clusters/local/monitoring/alertmanager-config.yaml
+# for the routing configuration.
