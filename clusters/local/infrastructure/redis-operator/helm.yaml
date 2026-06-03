@@ -1,0 +1,14 @@
+chart: redis-operator
+release: redis-operator
+namespace: redis-operator
+createNamespace: true
+timeout: 4m
+source:
+  type: helm
+  repoName: ot-helm
+  repoUrl: https://ot-container-kit.github.io/helm-charts/
+waitFor:
+  kind: deployment
+  selector: app.kubernetes.io/name=redis-operator
+  namespace: redis-operator
+  timeout: 180s
