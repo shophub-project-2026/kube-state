@@ -44,6 +44,13 @@ grafana:
       allow_sign_up: false
     auth.anonymous:
       enabled: false
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    hosts:
+      - grafana.local
+    path: /
+    pathType: Prefix
   sidecar:
     dashboards:
       enabled: true
