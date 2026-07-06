@@ -28,13 +28,20 @@ hpa:
 config:
   httpPort: "8080"
   jwtSecret: "change-me-before-deploy"
-  db:
-    host: postgresql.shophub.svc.cluster.local
-    port: "5432"
-    name: shophub_db
-    user: shophub_user
-    password: "change-me-before-deploy"
   kubeconfig: ""
+
+# ShopHub's own PostgreSQL runs through the CloudNativePG operator (§1.2
+# napomena: baze se deployuju preko svojih operatora) — the chart renders a
+# postgresql.cnpg.io/v1 Cluster and the app reads credentials from the
+# CNPG-generated Secret shophub-db-app. No database password lives in git.
+database:
+  cnpg:
+    enabled: true
+    clusterName: shophub-db
+    instances: 1
+    storageSize: 1Gi
+    databaseName: shophub_db
+    owner: shophub_user
 
 serviceMonitor:
   enabled: true
