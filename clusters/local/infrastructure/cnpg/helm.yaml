@@ -1,0 +1,14 @@
+chart: cloudnative-pg
+release: cnpg
+namespace: cnpg-system
+createNamespace: true
+timeout: 4m
+source:
+  type: helm
+  repoName: cnpg
+  repoUrl: https://cloudnative-pg.github.io/charts
+waitFor:
+  kind: deployment
+  selector: app.kubernetes.io/name=cloudnative-pg
+  namespace: cnpg-system
+  timeout: 180s

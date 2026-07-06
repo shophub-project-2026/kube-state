@@ -1,0 +1,30 @@
+# Extra Grafana datasources (Tempo + Loki) imported by the kube-prometheus-stack
+# Grafana sidecar (label grafana_datasource=1). This wires tracing and logging
+# into the same Grafana the metrics dashboards live in, satisfying §4.1's
+# "tracing, logging i metrike ... prikazati na Grafana dashboard-u".
+#
+# NOTE: do not set an explicit `uid` here — Grafana 13's provisioner rejects a
+# provisioned datasource carrying a uid that does not already exist ("data
+# source not found") and the pod crash-loops. Dashboards select the datasource
+# via a picker variable, so a fixed uid is unnecessary.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-extra-datasources
+  namespace: monitoring
+  labels:
+    grafana_datasource: "1"
+data:
+  tempo-loki-datasources.yaml: |
+    apiVersion: 1
+    datasources:
+      - name: Tempo
+        type: tempo
+        access: proxy
+        url: http://tempo.monitoring.svc.cluster.local:3200
+        jsonData:
+          httpMethod: GET
+      - name: Loki
+        type: loki
+        access: proxy
+        url: http://loki.monitoring.svc.cluster.local:3100

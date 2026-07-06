@@ -1,0 +1,26 @@
+# Grafana Tempo (single-binary) — receives OTLP traces from shop instances.
+# Release: tempo, namespace: monitoring. Reachable at tempo.monitoring:4318 (HTTP).
+tempo:
+  receivers:
+    otlp:
+      protocols:
+        http:
+          endpoint: 0.0.0.0:4318
+        grpc:
+          endpoint: 0.0.0.0:4317
+  storage:
+    trace:
+      backend: local
+      local:
+        path: /var/tempo/traces
+  retention: 24h
+
+persistence:
+  enabled: false
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 128Mi
+  limits:
+    memory: 512Mi

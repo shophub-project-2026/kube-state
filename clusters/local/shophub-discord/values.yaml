@@ -1,51 +1,24 @@
-image:
-  repository: milos2002/shophub
-  tag: main
-  pullPolicy: Always
+# Value overrides for the shophub-discord chart (platform Discord routing).
+#
+# The webhook URL is a credential and is never committed: discord.webhookUrl
+# stays empty and the Secret alertmanager-discord-secret is provisioned
+# out-of-band by pokretanje.ps1 (interactive prompt on first run):
+#   kubectl create secret generic alertmanager-discord-secret -n monitoring \
+#     --from-literal=webhook-url='<discord-webhook-url>'
+discord:
+  webhookUrl: ""
+  secret:
+    name: alertmanager-discord-secret
+    key: webhook-url
 
-replicaCount: 1
+# Platform alerts only; per-shop alerts (label shop=<name>) are routed by the
+# shop-operator's per-shop AlertmanagerConfig to the shop's own channel.
+route:
+  matchers:
+    - name: team
+      matchType: "=~"
+      value: "platform|shophub"
+  repeatInterval: 12h
 
-ingress:
-  enabled: true
-  className: nginx
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
-  hosts:
-    - host: shophub-discord.local
-      paths:
-        - path: /
-          pathType: Prefix
-
-resources:
-  limits:
-    cpu: 250m
-    memory: 128Mi
-  requests:
-    cpu: 50m
-    memory: 64Mi
-
-config:
-  httpPort: "8080"
-  jwtSecret: "change-me-before-deploy"
-  db:
-    host: postgresql.shophub.svc.cluster.local
-    port: "5432"
-    name: shophub_db
-    user: shophub_user
-    password: "change-me-before-deploy"
-  kubeconfig: ""
-
-podAnnotations:
-  discord.shophub.io/channel: "alerts"
-
-serviceMonitor:
-  enabled: true
-  interval: 15s
-  path: /metrics
-
-rbac:
-  create: false
-
-serviceAccount:
-  create: false
-  name: shophub
+alertmanagerConfigLabels:
+  release: kube-prometheus-stack

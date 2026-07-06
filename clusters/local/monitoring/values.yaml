@@ -1,0 +1,61 @@
+# Values override for kube-prometheus-stack (release: kube-prometheus-stack, ns: monitoring)
+# Installed standalone so the PrometheusRules, AlertmanagerConfig and Grafana
+# dashboards in this folder/cluster are picked up cluster-wide.
+
+fullnameOverride: kube-prometheus-stack
+
+prometheus:
+  prometheusSpec:
+    # Discover ServiceMonitors / PodMonitors / Rules in ALL namespaces,
+    # not just those carrying the Helm release label.
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
+    ruleSelectorNilUsesHelmValues: false
+    probeSelectorNilUsesHelmValues: false
+    serviceMonitorNamespaceSelector: {}
+    podMonitorNamespaceSelector: {}
+    ruleNamespaceSelector: {}
+    retention: 2d
+    resources:
+      requests:
+        cpu: 100m
+        memory: 400Mi
+      limits:
+        memory: 1Gi
+
+alertmanager:
+  alertmanagerSpec:
+    # Pick up AlertmanagerConfig CRDs (e.g. the Discord receiver) across namespaces.
+    alertmanagerConfigSelector:
+      matchLabels:
+        release: kube-prometheus-stack
+    alertmanagerConfigNamespaceSelector: {}
+    alertmanagerConfigMatcherStrategy:
+      type: None
+
+grafana:
+  # §4.1: only maintainers may access Grafana. Login is required (anonymous
+  # access disabled) and self sign-up is off, so ShopHub end users — who never
+  # receive these credentials and reach Grafana via no ShopHub link — have no
+  # access. Change adminPassword before any non-local deployment.
+  adminPassword: "shophub-maintainer-2026"
+  grafana.ini:
+    users:
+      allow_sign_up: false
+    auth.anonymous:
+      enabled: false
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    hosts:
+      - grafana.local
+    path: /
+    pathType: Prefix
+  sidecar:
+    dashboards:
+      enabled: true
+      label: grafana_dashboard
+      labelValue: "1"
+      searchNamespace: ALL
+    datasources:
+      enabled: true

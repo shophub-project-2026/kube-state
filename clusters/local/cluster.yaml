@@ -1,4 +1,4 @@
 name: local
-provider: minikube
+provider: docker-desktop
 kubeVersion: ">=1.26.0"
-description: Local development cluster running on Minikube
+description: Local development cluster running on Docker Desktop (kind-based Kubernetes)
