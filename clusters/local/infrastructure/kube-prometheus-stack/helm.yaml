@@ -1,0 +1,14 @@
+chart: kube-prometheus-stack
+release: kube-prometheus-stack
+namespace: monitoring
+createNamespace: true
+timeout: 6m
+source:
+  type: local
+  path: helm-charts/charts/shophub/charts/kube-prometheus-stack-85.3.3.tgz
+valuesFile: monitoring/values.yaml
+waitFor:
+  kind: deployment
+  selector: app=kube-prometheus-stack-operator
+  namespace: monitoring
+  timeout: 180s

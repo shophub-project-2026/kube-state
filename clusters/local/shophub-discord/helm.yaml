@@ -1,10 +1,14 @@
-chart: shophub
+# Chart name in OCI format (spec §5.3). Published by the helm-charts repo's
+# release workflow; source of the chart is
+# https://github.com/shophub-project-2026/helm-charts (charts/shophub-discord).
+#
+# This release owns the platform-level Discord alert routing: an
+# AlertmanagerConfig delivering cluster + ShopHub alerts (team=platform|shophub)
+# to Discord. The webhook URL lives in the Secret alertmanager-discord-secret
+# (monitoring namespace), provisioned out-of-band by pokretanje.ps1 — never in
+# git. Per-shop channels are created by the shop-operator.
+chart: oci://ghcr.io/shophub-project-2026/charts/shophub-discord
 version: "0.1.0"
 release: shophub-discord
-namespace: shophub
+namespace: monitoring
 createNamespace: true
-source:
-  type: git
-  url: https://github.com/shophub-project-2026/helm-charts
-  path: charts/shophub
-  revision: main

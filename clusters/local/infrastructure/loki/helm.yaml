@@ -1,0 +1,10 @@
+chart: loki-stack
+release: loki
+namespace: monitoring
+createNamespace: false
+timeout: 5m
+source:
+  type: helm
+  repoName: grafana
+  repoUrl: https://grafana.github.io/helm-charts
+valuesFile: monitoring/loki-values.yaml

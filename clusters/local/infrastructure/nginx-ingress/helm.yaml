@@ -1,0 +1,14 @@
+chart: ingress-nginx
+release: ingress-nginx
+namespace: ingress-nginx
+createNamespace: true
+timeout: 3m
+source:
+  type: helm
+  repoName: ingress-nginx
+  repoUrl: https://kubernetes.github.io/ingress-nginx
+waitFor:
+  kind: deployment
+  selector: app.kubernetes.io/component=controller
+  namespace: ingress-nginx
+  timeout: 180s

@@ -1,0 +1,10 @@
+chart: tempo
+release: tempo
+namespace: monitoring
+createNamespace: false
+timeout: 4m
+source:
+  type: helm
+  repoName: grafana
+  repoUrl: https://grafana.github.io/helm-charts
+valuesFile: monitoring/tempo-values.yaml
