@@ -10,14 +10,36 @@ clusters/
     ├── cluster.yaml          # Cluster metadata
     ├── alerts/               # PrometheusRule alert definitions
     ├── grafana/              # Grafana dashboard ConfigMaps
+    ├── infrastructure/       # Third-party infra releases (CNPG, Redis operator, ingress, observability)
     ├── monitoring/           # Observability stack values (Prometheus, Grafana, Loki, Tempo)
-    ├── shop-operator/        # Shop operator Helm release values
-    └── shophub/              # ShopHub Helm release values
+    ├── shop-operator/        # Shop operator Helm release (OCI chart + values)
+    ├── shophub/              # ShopHub Helm release (OCI chart + values, incl. CNPG DB)
+    └── shophub-discord/      # Platform Discord alert routing (OCI chart + values)
 ```
 
 Each Helm release directory contains:
-- `helm.yaml` — chart reference, version, namespace, and source
+- `helm.yaml` — **chart name in OCI format** (spec §5.3), version, release and namespace.
+  Own charts are published by the `helm-charts` repo to
+  `oci://ghcr.io/shophub-project-2026/charts/<name>`.
 - `values.yaml` — environment-specific value overrides
+
+## Design decisions
+
+- **Cluster provider — Docker Desktop Kubernetes.** The spec lists minikube,
+  kind and k3s as example local clusters; Docker Desktop runs an equivalent
+  single-node (kind-based) cluster and all §4.1 cluster metrics come from the
+  same node-exporter/kube-state-metrics stack, so the choice does not affect
+  any requirement.
+- **Redis operator — OT-Container-Kit instead of REDB.** REDB (Redis
+  Enterprise's database controller) requires a licensed Redis Enterprise
+  cluster. The spec explicitly allows a different database as long as *its
+  operator* performs the deployment; `database: light` shops therefore use the
+  open-source [OT-Container-Kit redis-operator](https://github.com/OT-CONTAINER-KIT/redis-operator),
+  which provisions Redis through a CRD exactly like CNPG does for PostgreSQL.
+- **Databases via operators everywhere.** Per-shop databases are provisioned by
+  the shop-operator through CNPG/Redis operator CRDs; ShopHub's own PostgreSQL
+  is likewise a CNPG `Cluster` rendered by the shophub chart — no hand-managed
+  database deployments and no DB passwords in git.
 
 ## Local deployment
 

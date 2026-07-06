@@ -1,18 +1,24 @@
-# Platform Discord integration for ShopHub and cluster-level alerts.
+# Value overrides for the shophub-discord chart (platform Discord routing).
 #
-# The platform webhook URL is stored in the Secret alertmanager-discord-secret
-# in the monitoring namespace (never committed to git). This Secret is
-# referenced by the AlertmanagerConfig in clusters/local/monitoring/alertmanager-config.yaml
-# which routes alerts with team=platform or team=shophub labels to Discord.
-#
-# To provision the secret:
+# The webhook URL is a credential and is never committed: discord.webhookUrl
+# stays empty and the Secret alertmanager-discord-secret is provisioned
+# out-of-band by pokretanje.ps1 (interactive prompt on first run):
 #   kubectl create secret generic alertmanager-discord-secret -n monitoring \
-#     --from-literal=webhook-url='<your-discord-webhook-url>'
-#
-# A placeholder with an empty URL is applied by pokretanje.ps1 if the secret
-# is not present (see clusters/local/monitoring/alertmanager-discord-secret.yaml).
+#     --from-literal=webhook-url='<discord-webhook-url>'
 discord:
-  alertmanager:
-    secretName: alertmanager-discord-secret
-    secretKey: webhook-url
-    namespace: monitoring
+  webhookUrl: ""
+  secret:
+    name: alertmanager-discord-secret
+    key: webhook-url
+
+# Platform alerts only; per-shop alerts (label shop=<name>) are routed by the
+# shop-operator's per-shop AlertmanagerConfig to the shop's own channel.
+route:
+  matchers:
+    - name: team
+      matchType: "=~"
+      value: "platform|shophub"
+  repeatInterval: 12h
+
+alertmanagerConfigLabels:
+  release: kube-prometheus-stack
